@@ -44,5 +44,40 @@
       "extracted_at": "2025-08-07T01:59:15.789012",
       "source": "https://shasanadesh.up.gov.in/frmPDF.aspx?qry=EXAMPLE4"
     }
+  ],
+  "https://etender.up.nic.in": [
+    {
+      "project_name": "Construction of Community Health Center",
+      "department": "Medical Health and Family Welfare Department",
+      "location": "Kanpur, Uttar Pradesh",
+      "budget": 18000000,
+      "deadline": "2026-01-20",
+      "contact_info": "Chief Medical Officer, Kanpur, Phone: +91-9876543211",
+      "requirements": "Build as per NABH standards; include OPD, IPD, and emergency facilities.",
+      "extracted_at": "2025-08-07T02:01:10.123456",
+      "source": "https://etender.up.nic.in/nicgep/app?page=FrontEndTendersByOrganisation&service=page"
+    },
+    {
+      "project_name": "Renovation of District Collectorate Building",
+      "department": "Public Works Department",
+      "location": "Agra, Uttar Pradesh",
+      "budget": 9500000,
+      "deadline": "2025-10-10",
+      "contact_info": "Executive Engineer, PWD Agra, Phone: +91-9876543222",
+      "requirements": "Renovation must preserve heritage features; ensure accessibility improvements.",
+      "extracted_at": "2025-08-07T02:02:45.654321",
+      "source": "https://etender.up.nic.in/nicgep/app?page=FrontEndTendersByOrganisation&service=page"
+    },
+    {
+      "project_name": "Supply and Installation of Water Purification Systems in Schools",
+      "department": "Basic Education Department",
+      "location": "Gorakhpur, Uttar Pradesh",
+      "budget": 4000000,
+      "deadline": "2025-09-30",
+      "contact_info": "District Education Officer, Gorakhpur, Phone: +91-9811122244",
+      "requirements": "Install ISI-marked water purifiers in 100 schools; provide maintenance for 3 years.",
+      "extracted_at": "2025-08-07T02:03:30.789012",
+      "source": "https://etender.up.nic.in/nicgep/app?page=FrontEndTendersByOrganisation&service=page"
+    }
   ]
 }
