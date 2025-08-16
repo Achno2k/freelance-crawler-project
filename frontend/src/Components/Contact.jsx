@@ -24,7 +24,7 @@ const Contact = () => {
     setIsSubmitting(true);
     // console.log("submitting the form..")
     try {
-      console.log(import.meta.env.VITE_ACCESS_KEY);
+      // console.log(import.meta.env.VITE_ACCESS_KEY);
       const form = new FormData();
       form.append("access_key", import.meta.env.VITE_ACCESS_KEY);
       form.append("name", formData.name);

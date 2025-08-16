@@ -1,0 +1,8 @@
+{
+  "https://shasanadesh.up.gov.in":  {
+    "url": "https://shasanadesh.up.gov.in",
+    "content_type": "pdf",
+    "prompt": "You are given text extracted from a government tender document.gov_tender_construction_v1 Extract the following fields in JSON:\n\n- project_name: Name of the construction project (in English if possible, otherwise Hindi)\n- department: Government department or ministry issuing the tender\n- location: Project location, city, state\n- budget: Project budget amount (extract only the number, no currency symbols)\n- deadline: Last date for tender submission (format as YYYY-MM-DD if possible)\n- contact_info: Contact person, office, phone number, email\n- requirements: Key technical requirements, specifications, or conditions\n- work_description: Brief description of the work to be done\n\nReturn the extracted information as a JSON object with exactly these keys. If any field is missing, use null.",
+    "output_schema": "gov_tender_construction_v1"
+  }
+}

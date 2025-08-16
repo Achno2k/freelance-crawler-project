@@ -1,0 +1,48 @@
+{
+  "https://shasanadesh.up.gov.in": [
+    {
+      "project_name": "Restoration and Demarcation of Canal Land from Km 0.000 to Km 15.500 of Bhadouli Canal",
+      "department": "Irrigation and Water Resources Department",
+      "location": "Ayodhya, Uttar Pradesh",
+      "budget": 5000000,
+      "deadline": "2025-12-31",
+      "contact_info": "Executive Engineer, Irrigation Division, Ayodhya, Phone: +91-9876543210",
+      "requirements": "Ensure work quality and completion within the stipulated time as per government norms.",
+      "extracted_at": "2025-08-07T01:55:39.297450",
+      "source": "https://shasanadesh.up.gov.in/frmPDF.aspx?qry=EXAMPLE1"
+    },
+    {
+      "project_name": "Construction of New Government Primary School Building in Sector 12",
+      "department": "Basic Education Department",
+      "location": "Noida, Uttar Pradesh",
+      "budget": 12000000,
+      "deadline": "2026-03-15",
+      "contact_info": "District Education Officer, Gautam Buddh Nagar, Phone: +91-9811122233",
+      "requirements": "Follow prescribed construction standards; ensure facilities for classrooms, toilets, and drinking water.",
+      "extracted_at": "2025-08-07T01:57:10.123456",
+      "source": "https://shasanadesh.up.gov.in/frmPDF.aspx?qry=EXAMPLE2"
+    },
+    {
+      "project_name": "Upgradation of Rural Roads under PMGSY Phase-III",
+      "department": "Public Works Department",
+      "location": "Varanasi, Uttar Pradesh",
+      "budget": 25000000,
+      "deadline": "2026-06-30",
+      "contact_info": "Superintending Engineer, PWD Varanasi Zone, Phone: +91-9876000011",
+      "requirements": "Road construction must comply with PMGSY specifications; ensure timely maintenance during defect liability period.",
+      "extracted_at": "2025-08-07T01:58:20.654321",
+      "source": "https://shasanadesh.up.gov.in/frmPDF.aspx?qry=EXAMPLE3"
+    },
+    {
+      "project_name": "Installation of Solar Street Lights in Urban and Rural Areas",
+      "department": "New and Renewable Energy Development Agency",
+      "location": "Lucknow, Uttar Pradesh",
+      "budget": 8000000,
+      "deadline": "2025-11-15",
+      "contact_info": "Project Director, UPNEDA, Phone: +91-9123456780",
+      "requirements": "Install high-quality solar street lights with a warranty of 5 years; ensure proper training to local bodies for maintenance.",
+      "extracted_at": "2025-08-07T01:59:15.789012",
+      "source": "https://shasanadesh.up.gov.in/frmPDF.aspx?qry=EXAMPLE4"
+    }
+  ]
+}

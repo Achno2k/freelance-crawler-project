@@ -1,0 +1,7 @@
+1. logout acting wierd for some reason (fixed just refresh anything, state managment? fk that)
+2. /results/info is getting hit twice in a single call (Just a development issue due to React StrictMode)
+3. redis setup and db info table 
+4. change the styles of the auth pages
+5. improve pdf handling better
+6. adding first and last name in the users table (Done)
+7. website throtlling, no idea why is that happening
