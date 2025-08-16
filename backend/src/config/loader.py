@@ -9,11 +9,8 @@ class Settings(BaseSettings):
     ALGORITHM: str
     ACCESS_TOKEN_EXPIRES_MIN: int = 15
     REFRESH_TOKEN_EXPIRES_DAYS: int = 14
-    # EMAIL_FROM: str
-    # SMTP_HOST: str
-    # SMTP_PORT: int
-    # SMTP_USER: str
-    # SMTP_PASS: str
+    REDIS_HOST: str
+    REDIS_PORT: int
     FRONTEND_URL: str
     GEMINI_API_KEY: str
 
