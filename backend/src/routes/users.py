@@ -13,10 +13,15 @@ from schemas import UserCreate, UserResponse, LoginResponse
 import utils
 from auth.jwt_utils import create_access_token, create_refresh_token
 from config.loader import settings
+from auth.oauth2 import get_current_user
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+@router.get("/me") 
+async def get_details(user = Depends(get_current_user)):
+    return {"user_details": user.email}
 
 
 @router.post("/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
@@ -50,7 +55,6 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: 
     user = result.scalars().first()
 
     # print(user)
-
     if not user or not utils.verify_password(form_data.password, str(user.password_hash)):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

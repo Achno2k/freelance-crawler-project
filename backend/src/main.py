@@ -1,33 +1,34 @@
 import asyncio
-import logging
 import uvicorn
-from fastapi import FastAPI, Depends
+import redis
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import text
 from contextlib import asynccontextmanager
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from datetime import datetime
 
+from logger import setup_logger
 from routes import results, users
 from database import engine, Base
 from config.loader import settings
-from auth.oauth2 import get_current_user
-from schedular.job import start_job
+from cache.utils import set_results
+from cache.client import get_redis
 
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+schedular = AsyncIOScheduler()
+logger = setup_logger('__name__')
 
-app = FastAPI()
+logger.info("API Starting...")
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[settings.FRONTEND_URL],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-app.include_router(results.router)
-app.include_router(users.router)
+def start_job():
+    schedular.add_job(
+        set_results, 
+        "interval", 
+        hours=24,
+        next_run_time=datetime.now()  
+    )
+    schedular.start()   
 
 async def init_db(retries: int = 5, delay_seconds: int = 2) -> None:
     for attempt in range(1, retries + 1):
@@ -49,6 +50,14 @@ async def init_db(retries: int = 5, delay_seconds: int = 2) -> None:
                 raise
             await asyncio.sleep(delay_seconds)
 
+async def redis_init():
+    try:
+        client = await get_redis()
+        await client.ping()
+        logger.info("Redis connected")
+    except Exception as e:
+        logger.error(f"Redis connection failed: {str(e)}")
+        raise
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -56,7 +65,9 @@ async def lifespan(app: FastAPI):
         # Starting the db
         await init_db()
         logger.info("Application DB startup complete")
-
+        # Connecting to redis
+        await redis_init()
+        logger.info("Redis successfully connected")
         # Now starting the schedular 
         start_job()
         logger.info("Schedular job successfully started")
@@ -68,14 +79,22 @@ async def lifespan(app: FastAPI):
         logger.info("Application shutdown complete and engine disposed")
     
 
+app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[settings.FRONTEND_URL],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(results.router)
+app.include_router(users.router)
+
 @app.get("/")
 async def root():
     return {"message": "Hello World!"}
-
-@app.get("/me") 
-async def get_details(user = Depends(get_current_user)):
-    return {"user_details": user.email}
-
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
