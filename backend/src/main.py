@@ -1,6 +1,5 @@
 import asyncio
 import uvicorn
-import redis
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import SQLAlchemyError
@@ -9,7 +8,7 @@ from contextlib import asynccontextmanager
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime
 
-from logger import setup_logger
+from logger import logger
 from routes import results, users
 from database import engine, Base
 from config.loader import settings
@@ -17,7 +16,6 @@ from cache.utils import set_results
 from cache.client import get_redis
 
 schedular = AsyncIOScheduler()
-logger = setup_logger('__name__')
 
 logger.info("API Starting...")
 
@@ -68,7 +66,7 @@ async def lifespan(app: FastAPI):
         # Connecting to redis
         await redis_init()
         logger.info("Redis successfully connected")
-        # Now starting the schedular 
+        # Now starting the schedular (sync job)
         start_job()
         logger.info("Schedular job successfully started")
         yield

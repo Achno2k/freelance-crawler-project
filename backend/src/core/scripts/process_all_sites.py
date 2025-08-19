@@ -1,11 +1,12 @@
 import json
 import os
 from schemas import LLMResponse
-from llm.llm_client import process_website
+from core.llm.llm_client import process_website
 from config import sites_prompt_map
 from typing import List, Dict
+from logger import logger
 
-OUTPUT_PATH = "./output/results.json"
+OUTPUT_PATH = "../output/results.json"
 
 async def process_web_sources():
     all_results: Dict[str, List[LLMResponse]] = {}
@@ -14,15 +15,15 @@ async def process_web_sources():
 
         url = site_config.get_url()
         if not url:
-            print(f"[WARN] No URL provided for {domain}. Skipping.")
+            logger.warning(f"No URL provided for {domain}. Skipping.")
             continue
 
-        print(f"\n🔍 Processing {domain} ({url})")
+        logger.info(f"Processing {domain} ({url})")
         try:
             results: List[LLMResponse] = await process_website(url, site_config)
             all_results[domain] = results
         except Exception as e:
-            print(f"[ERROR] Failed to process {domain}: {e}")
+            logger.info(f"Failed to process {domain}: {e}")
 
 
     output_dir = os.path.dirname(OUTPUT_PATH)
@@ -36,13 +37,8 @@ async def process_web_sources():
                 indent=2,
                 ensure_ascii=False
             )
-        print(f"\n📁 All results saved to: {OUTPUT_PATH}")
+        (f"\nAll results saved to: {OUTPUT_PATH}")
         return all_results
     except Exception as e:
         print(f"[ERROR] Failed to save results to {OUTPUT_PATH}: {e}")
     
-
-
-# async def main():
-#     data = await process_all_sites()
-#     return data

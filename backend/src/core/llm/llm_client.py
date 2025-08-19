@@ -1,10 +1,11 @@
 from urllib.parse import urlparse, urljoin
-from llm.prompt_engine import generate_output_from_llm
-from crawler.crawl_engine import crawl_website
-from extarctors.pdf_extractor import extract_text_from_pdf_url
+from core.llm.prompt_engine import generate_output_from_llm
+from core.crawler.crawl_engine import crawl_website
+from core.extarctors.pdf_extractor import extract_text_from_pdf_url
 from schemas import LLMResponse, CrawlResult, WebsitePromptConfig
 from typing import List, Optional, Union
-import pprint
+from logger import logger
+
 
 #  Defining the response type datatype to ensure type safety 
 # pdf --> LLMResponse --> for every single website a single response
@@ -25,30 +26,26 @@ async def process_website(url: str, site_config: WebsitePromptConfig) -> List[LL
         if crawl_result and crawl_result.pdf_urls is not None:
             all_pdf_urls = [urljoin(crawl_result.url, link) for link in crawl_result.pdf_urls]
         
-        print(f"[INFO] Found {len(all_pdf_urls)} downloadable PDFs.")
+        logger.info(f"Found {len(all_pdf_urls)} PDFs from web")
 
         for idx, pdf_url in enumerate(all_pdf_urls):
-            # if idx == 2:
-            #     break
-            if len(results) == 2:   # for debugging
-                break
-            print(f"Extracting the pdf text from {idx+1} pdf")
+            logger.info(f"Extracting the pdf text from {idx+1} pdf")
             pdf_text = extract_text_from_pdf_url(pdf_url=pdf_url)
-            print(f"Getting the llm response from the {idx+1} pdf")
+            logger.info(f"Getting the llm response from the {idx+1} pdf")
             # Extracting the LLMResponse for a single pdf
             llm_response: ResponseType = generate_output_from_llm(domain, pdf_text, site_config, pdf_url)
             if llm_response is not None and type(llm_response) == LLMResponse:
-                print(f"Successfully appended {idx+1} response(s) to the results")
+                logger.info(f"Successfully appended {idx+1} response(s) to the results")
                 results.append(llm_response)
-                pprint.pprint(results[-1])
+                # pprint.pprint(results[-1])
 
     else:
-        print("[INFO] No downloadable PDFs found. Using page markdown to extract the data.")
+        logger.info("No downloadable PDFs found. Using page markdown to extract the data.")
         content_markdown = crawl_result.markdown
         llm_responses: ResponseType = generate_output_from_llm(domain, content_markdown, site_config, "")
         # Extracting the response in type of List[LLMResponse]
         if llm_responses and type(llm_responses) == List[LLMResponse]:
-            print(f"Successfully appended HTML-based response(s) to the results")
+            logger.info(f"Successfully appended HTML-based response(s) to the results")
             results.extend(llm_responses)
     
     if not results:

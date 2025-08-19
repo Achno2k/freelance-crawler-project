@@ -22,9 +22,7 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // console.log("submitting the form..")
     try {
-      // console.log(import.meta.env.VITE_ACCESS_KEY);
       const form = new FormData();
       form.append("access_key", import.meta.env.VITE_ACCESS_KEY);
       form.append("name", formData.name);
@@ -37,8 +35,7 @@ const Contact = () => {
         body: form
       });
       const data = await response.json();
-      // console.log('Form submitted:', form);
-
+      
       if (data.success) {
         setSubmitStatus('success');
         setFormData({ name: '', email: '', phone: '', subject: '', message: '' });

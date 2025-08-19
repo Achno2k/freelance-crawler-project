@@ -1,8 +1,4 @@
-import asyncio
 from crawl4ai import AsyncWebCrawler, BrowserConfig, CrawlerRunConfig, CrawlResult
-from urllib.parse import urljoin
-from typing import List, Dict
-import pprint
 from schemas import CrawlResult
 
 def is_downloadable_file(link: str) -> bool:
@@ -27,7 +23,7 @@ async def crawl_website(url: str) -> CrawlResult:
         word_count_threshold=10,
         exclude_external_links=False,
     )
-
+    
     async with AsyncWebCrawler(config=browser_config) as crawler:
         result: CrawlResult = await crawler.arun(
             url=url, 
@@ -46,11 +42,3 @@ async def crawl_website(url: str) -> CrawlResult:
                 pdf_urls=list(set(file_links)),
                 url=url
             )
-
-
-# # Local test
-# if __name__ == "__main__":
-#     test_url = "https://shasanadesh.up.gov.in/"
-#     result = asyncio.run(crawl_website(test_url))
-#     # print("\n--- Markdown Preview ---\n", result["markdown"][:500])
-#     print("\n--- File Links Found ---\n", result["file_links"])

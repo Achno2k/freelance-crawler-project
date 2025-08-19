@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { User, LogOut } from 'lucide-react';
 
@@ -10,62 +10,41 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isHomePage = location.pathname === '/';
+  const hasCheckedAuth = useRef(false);
 
-  // Check authentication status
-  const checkAuthStatus = () => {
+  // Simplified auth check that only reads cookies once
+  const checkAuthStatus = useCallback(() => {
     const accessToken = document.cookie
       .split('; ')
       .find(row => row.startsWith('access_token='));
     const isAuth = !!accessToken;
     
-    // Only update state if it actually changed to prevent unnecessary re-renders
-    if (isAuth !== isAuthenticated) {
-      setIsAuthenticated(isAuth);
-      console.log('Auth status updated:', isAuth);
-    }
-    
+    console.log('Auth check performed:', isAuth);
+    setIsAuthenticated(isAuth);
     return isAuth;
-  };
+  }, []);
 
-  // Check auth status on mount and location changes
+  // Only check auth on initial mount
   useEffect(() => {
-    checkAuthStatus();
-  }, [location.pathname]); // Re-check when route changes
+    if (!hasCheckedAuth.current) {
+      checkAuthStatus();
+      hasCheckedAuth.current = true;
+    }
+  }, [checkAuthStatus]);
 
-  // Set up periodic auth checking (lightweight solution)
+  // Listen for custom auth change events only
   useEffect(() => {
-    checkAuthStatus();
-    
-    // Check auth status every 2 seconds (you can adjust this interval)
-    const authCheckInterval = setInterval(checkAuthStatus, 2000);
-    
-    // Listen for custom auth events
     const handleAuthChange = () => {
       console.log('Auth change event received');
       checkAuthStatus();
     };
 
-    // Listen for focus events (when user comes back to tab)
-    const handleFocus = () => {
-      checkAuthStatus();
-    };
-
-    // Listen for storage events (for cross-tab synchronization)
-    const handleStorageChange = () => {
-      checkAuthStatus();
-    };
-
     window.addEventListener('auth-changed', handleAuthChange);
-    window.addEventListener('focus', handleFocus);
-    window.addEventListener('storage', handleStorageChange);
     
     return () => {
-      clearInterval(authCheckInterval);
       window.removeEventListener('auth-changed', handleAuthChange);
-      window.removeEventListener('focus', handleFocus);
-      window.removeEventListener('storage', handleStorageChange);
     };
-  }, [isAuthenticated]); // Include isAuthenticated in dependency to avoid stale closures
+  }, [checkAuthStatus]);
 
   // Handle scroll effect
   useEffect(() => {
@@ -103,7 +82,7 @@ const Header = () => {
     { name: 'Contact', href: '#contact', type: 'section' },
   ];
 
-  const handleNavigation = (item) => {
+  const handleNavigation = useCallback((item) => {
     if (item.type === 'route') {
       navigate(item.href);
     } else {
@@ -115,7 +94,7 @@ const Header = () => {
       }
     }
     setIsMobileMenuOpen(false);
-  };
+  }, [navigate, isHomePage]);
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId.replace('#', ''));
@@ -136,39 +115,36 @@ const Header = () => {
     }
   };
 
-  const handleLogin = () => {
+  const handleLogin = useCallback(() => {
     navigate('/auth');
     setIsMobileMenuOpen(false);
-  };
+  }, [navigate]);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     console.log('Logout initiated');
     
-    // Clear auth cookies
+    // Clear cookies
     document.cookie = 'access_token=;path=/;max-age=0';
     document.cookie = 'refresh_token=;path=/;max-age=0';
     document.cookie = 'token_type=;path=/;max-age=0';
-    
-    // Immediately update state
+  
+    // Update state immediately
     setIsAuthenticated(false);
     setIsMobileMenuOpen(false);
     
-    // Dispatch custom event to notify other components
+    // Dispatch custom event
     window.dispatchEvent(new CustomEvent('auth-changed'));
     
-    console.log('Logout completed, redirecting...');
-    
-    // Use navigate with replace instead of window.location for better UX
-    navigate('/', { replace: true });
-    
-    // Alternative: Force refresh only if you're still having issues
-    // window.location.href = "/";
-  };
+    console.log('Logout completed, refreshing page...');
 
-  const handleDashboard = () => {
+    // Refresh the page to ensure clean state
+    window.location.href = '/auth';
+  }, []);
+
+  const handleDashboard = useCallback(() => {
     navigate('/dashboard');
     setIsMobileMenuOpen(false);
-  };
+  }, [navigate]);
 
   const isTransparent = isHomePage && !isScrolled;
 

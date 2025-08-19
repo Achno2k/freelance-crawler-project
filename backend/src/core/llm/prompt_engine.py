@@ -4,8 +4,7 @@ from google import genai
 from schemas import LLMResponse, WebsitePromptConfig
 from datetime import datetime
 from config.loader import settings
-
-# GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+from logger import logger
 
 client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
@@ -33,8 +32,6 @@ def generate_output_from_llm(domain: str, content: str, site_config: WebsiteProm
             model = model,
             contents = full_prompt,
         )
-
-
         if response is not None and response.text is not None:
             if response.text == "Not a government construction order":
                 return None
@@ -45,12 +42,11 @@ def generate_output_from_llm(domain: str, content: str, site_config: WebsiteProm
 
         
     except Exception as e:
-        print(f"[ERROR] Gemini request failed: {e}")
+        logger.error(f"[ERROR] Gemini request failed: {e}")
         return None
 
 
 def extract_output_pdf (response: str, pdf_url: str) -> Optional[LLMResponse]:
-
     extracted_data = _parse_json_response(response)
     llm_response = LLMResponse (
                     project_name=extracted_data.get('project_name', ''),
@@ -70,14 +66,14 @@ def extract_output_markdown(response: str) -> Optional[List[LLMResponse]]:
     extracted_data = _parse_json_response(response)
     
     if extracted_data is None:
-        print("[ERROR] Failed to extract or parse JSON from LLM response.")
+        logger.error("Failed to extract or parse JSON from LLM response.")
         return None
     
     if isinstance(extracted_data, dict):
         extracted_data = [extracted_data]
 
     if not isinstance(extracted_data, list):
-        print("[ERROR] Expected a list of JSON objects from LLM.")
+        logger.error("Expected a list of JSON objects from LLM.")
         return None
 
     try:
@@ -85,7 +81,7 @@ def extract_output_markdown(response: str) -> Optional[List[LLMResponse]]:
 
         for idx, item in enumerate(extracted_data):
             if not isinstance(item, dict):
-                print(f"[WARNING] Skipping non-dict item at index {idx}")
+                logger.error(f"Skipping non-dict item at index {idx}")
                 continue
 
             llm_responses.append(LLMResponse(
@@ -103,5 +99,5 @@ def extract_output_markdown(response: str) -> Optional[List[LLMResponse]]:
         return llm_responses
 
     except Exception as e:
-        print(f"[ERROR] Failed to parse items into LLMResponse: {e}")
+        logger.error(f"Failed to parse items into LLMResponse: {e}")
         return None
