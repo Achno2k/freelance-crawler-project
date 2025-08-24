@@ -19,7 +19,7 @@ def generate_jti() -> str:
     return str(uuid.uuid4())
 
 
-def create_access_token(subject: str, * , issuer: Optional[str] = None) -> Tuple[str, str]:
+def create_access_token(subject: int, * , issuer: Optional[str] = None) -> Tuple[str, str]:
     """
     Create a signed JWT access token and return (token, jti).
     Access tokens are meant to be short-lived.
@@ -30,7 +30,7 @@ def create_access_token(subject: str, * , issuer: Optional[str] = None) -> Tuple
     jti = generate_jti()
 
     payload = {
-        "sub": str(subject),
+        "sub": subject,
         "iat": int(iat.timestamp()),
         "exp": int(exp.timestamp()),
         "jti": jti,
@@ -42,7 +42,7 @@ def create_access_token(subject: str, * , issuer: Optional[str] = None) -> Tuple
     return token, jti
 
 
-def create_refresh_token(subject: str, issuer: Optional[str] = None) -> Tuple[str, str, datetime]:
+def create_refresh_token(subject: int, issuer: Optional[str] = None) -> Tuple[str, str, datetime]:
     """
     Create a signed refresh token and return (token, jti, expires_at).
     Refresh tokens are long lived and should have their `jti` stored server-side for rotation & revocation.
@@ -53,7 +53,7 @@ def create_refresh_token(subject: str, issuer: Optional[str] = None) -> Tuple[st
     jti = generate_jti()
 
     payload = {
-        "sub": str(subject),
+        "sub": subject,
         "iat": int(iat.timestamp()),
         "exp": int(exp.timestamp()),
         "jti": jti,

@@ -57,7 +57,7 @@ class UserCreate(BaseModel):
     password: str
 
 class UserResponse(BaseModel):
-    id: uuid.UUID
+    id: int
     email: EmailStr
     created_at: datetime
 

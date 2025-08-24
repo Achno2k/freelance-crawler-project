@@ -61,8 +61,8 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: 
             detail="Invalid credentials. Please try again."
         )
 
-    access_token, _ = create_access_token(subject=str(user.id))            # (token, jti)
-    refresh_token, _, _ = create_refresh_token(subject=str(user.id))  # (token, jti, expires_at)
+    access_token, _ = create_access_token(subject=user.id)            # (token, jti)
+    refresh_token, _, _ = create_refresh_token(subject=user.id)  # (token, jti, expires_at)
 
     # storing the new refresh token
     db_refresh_token = RefreshToken(
@@ -106,8 +106,8 @@ async def refresh_token(refresh_token: str = Body(..., embed=True), db: AsyncSes
     db_refresh_token.revoked = True # type: ignore
     # await db.commit()
 
-    new_access_token, _ = create_access_token(subject=str(db_refresh_token.user_id))
-    new_refresh_token, _, _ = create_refresh_token(subject=str(db_refresh_token.user_id))
+    new_access_token, _ = create_access_token(subject=db_refresh_token.user_id)
+    new_refresh_token, _, _ = create_refresh_token(subject=db_refresh_token.user_id)
 
     new_db_refresh_token = RefreshToken(
         user_id=db_refresh_token.user_id,
