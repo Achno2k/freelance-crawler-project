@@ -1,7 +1,7 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Body
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -68,7 +68,7 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: 
     db_refresh_token = RefreshToken(
         user_id=user.id,
         token_hash=refresh_token,
-        expires_at=datetime.now() + timedelta(settings.REFRESH_TOKEN_EXPIRES_DAYS)
+        expires_at=datetime.now(timezone.utc) + timedelta(settings.REFRESH_TOKEN_EXPIRES_DAYS)
     )
 
     db.add(db_refresh_token)
@@ -81,3 +81,46 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: 
     )
 
     return login_response
+
+@router.post("/refresh", response_model=LoginResponse, status_code=status.HTTP_200_OK)
+async def refresh_token(refresh_token: str = Body(..., embed=True), db: AsyncSession = Depends(get_db)):
+
+    result = await db.execute(
+        select(RefreshToken).where(RefreshToken.token_hash == refresh_token)
+    )
+    db_refresh_token = result.scalars().first()
+
+    if not db_refresh_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid refresh token"
+        )
+    
+    if bool(db_refresh_token.revoked) or bool(db_refresh_token.expires_at < datetime.now(timezone.utc)):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token expired or revoked"
+        )
+    
+
+    db_refresh_token.revoked = True # type: ignore
+    # await db.commit()
+
+    new_access_token, _ = create_access_token(subject=str(db_refresh_token.user_id))
+    new_refresh_token, _, _ = create_refresh_token(subject=str(db_refresh_token.user_id))
+
+    new_db_refresh_token = RefreshToken(
+        user_id=db_refresh_token.user_id,
+        token_hash=new_refresh_token,
+        expires_at=datetime.now(timezone.utc) + timedelta(days=settings.REFRESH_TOKEN_EXPIRES_DAYS),
+        replaced_by=db_refresh_token.id
+    )
+
+    db.add(new_db_refresh_token)
+    await db.commit()
+
+    return LoginResponse(
+        access_token=new_access_token,
+        refresh_token=new_refresh_token,
+        token_type="Bearer"
+    )

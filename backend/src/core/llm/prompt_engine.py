@@ -2,7 +2,7 @@ import json
 from typing import Optional, List
 from google import genai
 from schemas import LLMResponse, WebsitePromptConfig
-from datetime import datetime
+from datetime import datetime, timezone
 from config.loader import settings
 from logger import logger
 
@@ -56,7 +56,7 @@ def extract_output_pdf (response: str, pdf_url: str) -> Optional[LLMResponse]:
                     deadline=extracted_data.get('deadline'),
                     contact_info=extracted_data.get('contact_info', ''),
                     requirements=extracted_data.get('requirements', ''),
-                    extracted_at=datetime.now(),
+                    extracted_at=datetime.now(timezone.utc),
                     pdf_link=pdf_url
                 )
     return llm_response
@@ -92,7 +92,7 @@ def extract_output_markdown(response: str) -> Optional[List[LLMResponse]]:
                 deadline=item.get('deadline'),
                 contact_info=item.get('contact_info', ''),
                 requirements=item.get('requirements', ''),
-                extracted_at=datetime.now(),
+                extracted_at=datetime.now(timezone.utc),
                 pdf_link=None
             ))
 

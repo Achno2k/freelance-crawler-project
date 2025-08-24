@@ -36,7 +36,6 @@ const authAPI = {
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: formData
     });
-
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || 'Login failed');
     return data;
@@ -81,9 +80,4 @@ const authAPI = {
 };
 
 export default authAPI;
-
-
-
-
-
 

@@ -6,7 +6,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import text
 from contextlib import asynccontextmanager
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from datetime import datetime
+from datetime import datetime, timezone
 
 from logger import logger
 from routes import results, users
@@ -24,7 +24,7 @@ def start_job():
         set_results, 
         "interval", 
         hours=24,
-        next_run_time=datetime.now()  
+        next_run_time=datetime.now(timezone.utc)  
     )
     schedular.start()   
 

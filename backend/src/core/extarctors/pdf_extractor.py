@@ -6,7 +6,7 @@ from logger import logger
 
 def clean_extracted_text(text: str) -> str:
     """
-    Clean up common PDF text artifacts such as (cid:xxxx) and extra spaces.
+    Clean up common PDF text 
     """
     text = re.sub(r"\(cid:\d+\)", "", text)
     text = re.sub(r"\s{2,}", " ", text)
